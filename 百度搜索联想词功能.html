@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<style>
+		*{
+			margin:0;
+			padding:0;
+			list-style:none;
+		}
+		input{
+			position:absolute;
+			left:300px;
+			top:200px;
+			height:35px;
+			width:400px;
+			font-size:20px;
+			padding-left: 10px;
+			flex:2;
+			border:1px solid #bbb;
+		}
+		input:focus{
+			outline:none;
+			border:1px solid #3385ff;
+		}
+		input.submit{
+			position:absolute;
+			top:200px;
+			left:711px;
+			height:37px;
+			background-color: #3385ff;
+			border-bottom-color: #2d78e4;
+			font-size:16px;
+			color:white;
+			width:100px;
+			border:none;
+			outline:medium;
+		}
+		.submit:hover{
+			background-color: #317ef3;
+			border-bottom-color: #2868c8;
+			box-shadow: 1px 1px 1px #ccc;
+		}
+		ul{
+			display: none;
+			position:absolute;
+			left:300px;
+			top:236px;
+			border:1px solid #ccc;
+			width:400px;
+			padding-left:10px;
+			flex:3;
+		}
+		a{
+			text-decoration:none;
+			color:#333;
+			margin-top:10px;
+		}
+	</style>
+</head>
+<body>
+	<form action="">
+		<input type="text">
+		<input type = "submit" class = "submit" value = "百度一下"></input>
+	</form>
+
+	<ul></ul>
+	<script>
+		var oInput = document.getElementsByTagName('input')[0],
+				oUl = document.getElementsByTagName('ul')[0],
+				oSubmit = document.getElementsByTagName('input')[1];
+
+		//防抖
+		var setUserAction = debouce(func,100,false);
+		oInput.oninput = setUserAction;
+		//防抖函数
+		function debouce(func,wait,immediate){
+			var timer = null;
+			var debouced = function(){
+				var _this = this,
+						argus = arguments;
+				clearTimeout(timer);
+				if(immediate){
+					if(!timer) func.apply(_this,argus);
+					timer = setTimeout(function(){
+						timer = null;
+					},wait)
+				}else{
+					timer = setTimeout(function(){
+						func.apply(_this,argus);
+					},wait);
+				}
+			}
+			debouced.cancel = function(){
+				clearTimeout(timer);
+				timer = null;
+			}
+			return debouced;
+		}
+
+		function func(){
+			var value = oInput.value,
+					oScript = document.createElement('script'),
+					str = '';
+			oScript.src = 'https://sp0.baidu.com/5a1Fazu8AA54nxGko9WTAnF6hhy/su?wd='+ value +'&cb=callback';
+			document.body.appendChild(oScript);
+			document.body.removeChild(oScript);
+			oSubmit.onclick = function(){
+				window.open('https://www.baidu.com/s?ie=utf-8&f=3&rsv_bp=0&rsv_idx=1&tn=baidu&wd='+ value );
+			}
+		}
+		oInput.onblur = function(){
+			oInput.style.borderBottom = "1px solid #bbb";
+		}
+		function callback(data){
+			var s = data.s,
+					str = '';
+			if(s.length > 0){
+				oUl.style.display = "block";
+				oInput.style.borderBottom = "none";
+				s.forEach(function(ele,index){
+					str += '<li><a href = "https://www.baidu.com/s?ie=utf-8&f=3&rsv_bp=0&rsv_idx=1&tn=baidu&wd='+ ele +'">'+ ele +'</a></li>';
+				})
+				oUl.innerHTML = str;
+			}else{
+				oUl.style.display = "none";
+				oInput.style.borderBottom = "1px solid #3385ff";
+			}
+		}
+	</script>
+</body>
+</html>
